@@ -1,0 +1,48 @@
+---
+title: "DataThink"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+# Setup
+```{r}
+library(tidyverse)
+library(readxl)
+dataset<- read_excel("Digest 2020 Decatur KA.xlsx")
+View(dataset)
+```
+
+# Explore the dataset
+
+```{r}
+summary(dataset)
+```
+
+What about mean and median market value, when grouping by zipcode?
+
+```{r}
+sum(is.na(dataset$'"MARKET" VALUE'))
+```
+Rename the variables for easier use:
+```{r}
+dataset2 <- dataset %>% rename(marketValue = '"MARKET" VALUE',
+                               land40 = `Land (40%)`,
+                               bldg40 = `Bldg (40%)`,
+                               totASMT40 = `TOT ASMT (40%)`)
+```
+
+```{r}
+dataset2 %>% group_by(Zip) %>% 
+  summarize(avgMV = mean(marketValue), medianMV = median(marketValue)) %>% arrange(avgMV)
+```
+
+What about mean and median land, when grouping by zipcode?
+```{r}
+dataset2 %>% group_by(Zip) %>% 
+  summarize(avgland = mean(land40), medianMV = median(land40)) %>% arrange(avgland)
+```
+
+Based on just marketValue and land40, we can get a pretty good idea of the cheapest zipcodes to live in decatur (30307) and the most expensive (30030). We are a little confused because technically 30030 is Decatur and 30307 is NW Georgia. Looks like we're going to have to filter this data set down to just 30030 to look at only decatur.
+
+Next steps could be to merge this data with data from the GIS map.
